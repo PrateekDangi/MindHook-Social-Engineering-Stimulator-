@@ -99,5 +99,3 @@ This project is licensed under the **MIT License**.
 ## 👤 Author
 
 **Prateek Dangi**  
-B.Tech Cyber Security  
-SeSim – Social Engineering Simulator
