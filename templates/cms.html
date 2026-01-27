@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content & Template Manager</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+        }
+        /* Custom scrollbar for better look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 4px;
+        }
+        .ai-card {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+        .ai-card:hover {
+            transform: translateY(-2px);
+        }
+        .loading-ring {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <header class="bg-indigo-600 shadow-lg sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-white">AI Content & Template Manager</h1>
+            <p id="userIdDisplay" class="text-sm font-medium text-indigo-200 bg-indigo-700 py-1 px-3 rounded-full shadow-inner truncate max-w-xs"></p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+
+        <!-- AI Content Generation Section -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">AI Content Generator</h2>
+            <div class="bg-white p-6 rounded-xl ai-card">
+                <div class="mb-4">
+                    <label for="aiPromptInput" class="block text-sm font-medium text-gray-700 mb-2">Prompt (Tell the AI what you want to create):</label>
+                    <textarea id="aiPromptInput" rows="3" class="w-full px-4 py-3 border border-indigo-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" placeholder="e.g., Write a compelling product description for a new artisanal coffee blend called 'Morning Mist'." required></textarea>
+                </div>
+                <div class="flex justify-end mb-6">
+                    <button id="generateContentBtn" class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out flex items-center">
+                        <span id="generateBtnText">Generate Content</span>
+                        <div id="aiLoading" class="loading-ring ml-2 hidden"></div>
+                    </button>
+                </div>
+
+                <div id="aiResultArea" class="mt-6 border-t pt-6">
+                    <label for="aiOutputContent" class="block text-sm font-medium text-gray-700 mb-2">AI Generated Content (Review and Edit before saving):</label>
+                    <textarea id="aiOutputContent" rows="10" class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-inner bg-gray-50 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" placeholder="Generated content will appear here..." readonly></textarea>
+                    <div id="aiSources" class="mt-2 text-xs text-gray-600"></div>
+
+                    <div class="flex justify-end mt-4">
+                        <button id="saveAIAsTemplateBtn" disabled class="px-6 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out disabled:bg-green-300 disabled:cursor-not-allowed">
+                            Save as New Template
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Template Form Section -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">Manage Templates</h2>
+            <button id="toggleFormBtn" class="px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out mb-4">
+                + Create New Template
+            </button>
+
+            <form id="templateForm" class="bg-white p-6 rounded-xl ai-card hidden mt-4">
+                <h3 id="formTitle" class="text-2xl font-semibold text-gray-800 mb-4">Create Template</h3>
+                <input type="hidden" id="templateIdInput">
+
+                <div class="mb-4">
+                    <label for="templateTitleInput" class="block text-sm font-medium text-gray-700 mb-2">Template Title</label>
+                    <input type="text" id="templateTitleInput" required class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
+                </div>
+
+                <div class="mb-6">
+                    <label for="templateContentInput" class="block text-sm font-medium text-gray-700 mb-2">Template Content (Markdown/HTML supported)</label>
+                    <textarea id="templateContentInput" rows="10" required class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelFormBtn" class="px-6 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-100 transition duration-150 ease-in-out">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                        Save Template
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Templates List Section -->
+        <section>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">My Saved Templates</h2>
+            <div id="templatesList" class="space-y-4">
+                <p class="text-gray-500" id="noTemplatesMessage">No templates saved yet. Start creating!</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Message Box (Toast) -->
+    <div id="messageBox" class="message-box success hidden"></div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Confirm Deletion</h3>
+            <p class="text-gray-600 mb-6">Are you sure you want to delete this template? This action cannot be undone.</p>
+            <div class="flex justify-end space-x-3">
+                <button id="cancelDeleteBtn" class="px-4 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100">Cancel</button>
+                <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700">Delete</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, addDoc, deleteDoc, onSnapshot, collection, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Your Firebase configuration (hardcoded to fix the loading issue)
+        const firebaseConfig = {
+          apiKey: "AIzaSyAptu2Hqbgcapb8aZggF7J4JrNMlFGU1UE",
+          authDomain: "sesim-cms.firebaseapp.com",
+          projectId: "sesim-cms",
+          storageBucket: "sesim-cms.firebasestorage.app",
+          messagingSenderId: "659913243805",
+          appId: "1:659913243805:web:8502557fe040a053806874",
+          measurementId: "G-F4Y28PT8VY"
+        };
+        
+        // This is a fixed value from the Firebase config, now that we have it
+        const appId = firebaseConfig.appId;
+        const initialAuthToken = null; // No custom auth token is provided
+
+        let db = null;
+        let auth = null;
+        let userId = null;
+
+        // --- DOM Elements ---
+        const userIdDisplayEl = document.getElementById('userIdDisplay');
+        const templateFormEl = document.getElementById('templateForm');
+        const formTitleEl = document.getElementById('formTitle');
+        const templateIdInput = document.getElementById('templateIdInput');
+        const templateTitleInput = document.getElementById('templateTitleInput');
+        const templateContentInput = document.getElementById('templateContentInput');
+        const templatesListEl = document.getElementById('templatesList');
+        const noTemplatesMessageEl = document.getElementById('noTemplatesMessage');
+        const messageBoxEl = document.getElementById('messageBox');
+        const deleteModalEl = document.getElementById('deleteModal');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const toggleFormBtn = document.getElementById('toggleFormBtn');
+        const cancelFormBtn = document.getElementById('cancelFormBtn');
+
+        // AI Generation Elements
+        const aiPromptInputEl = document.getElementById('aiPromptInput');
+        const generateContentBtn = document.getElementById('generateContentBtn');
+        const aiOutputContentEl = document.getElementById('aiOutputContent');
+        const aiLoadingEl = document.getElementById('aiLoading');
+        const saveAIAsTemplateBtn = document.getElementById('saveAIAsTemplateBtn');
+        const generateBtnTextEl = document.getElementById('generateBtnText');
+        const aiSourcesEl = document.getElementById('aiSources');
+
+        // --- Utility Functions ---
+
+        /**
+         * Displays a success or error message to the user.
+         * @param {string} message The message to display.
+         * @param {boolean} isSuccess True for success (green), false for error (red).
+         */
+        function showMessage(message, isSuccess) {
+            messageBoxEl.textContent = message;
+            messageBoxEl.classList.remove('hidden', 'success', 'error');
+            messageBoxEl.classList.add(isSuccess ? 'success' : 'error', 'flex');
+            messageBoxEl.style.backgroundColor = isSuccess ? '#d1fae5' : '#fee2e2';
+            messageBoxEl.style.color = isSuccess ? '#065f46' : '#991b1b';
+            setTimeout(() => {
+                messageBoxEl.classList.add('hidden');
+                messageBoxEl.classList.remove('flex');
+            }, 3000);
+        }
+
+        /**
+         * Executes a fetch request with exponential backoff for retries.
+         * @param {string} url The API URL.
+         * @param {object} options Fetch options (method, headers, body).
+         * @param {number} maxRetries Maximum number of retries.
+         * @returns {Promise<Response>} The response object.
+         */
+        async function exponentialBackoffFetch(url, options, maxRetries = 3) {
+            let attempt = 0;
+            while (attempt < maxRetries) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        // Throw error if response is not ok (e.g., 400, 500)
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response;
+                } catch (error) {
+                    attempt++;
+                    if (attempt >= maxRetries) {
+                        console.error('Fetch failed after multiple retries:', error);
+                        throw error;
+                    }
+                    const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        // --- Core Application Functions ---
+
+        /**
+         * Handles the AI content generation via Gemini API.
+         */
+        async function generateAIContent() {
+            const prompt = aiPromptInputEl.value.trim();
+            if (!prompt) {
+                showMessage("Please enter a prompt to generate content.", false);
+                return;
+            }
+
+            // UI state management
+            aiOutputContentEl.value = '';
+            aiSourcesEl.textContent = '';
+            generateContentBtn.disabled = true;
+            saveAIAsTemplateBtn.disabled = true;
+            generateBtnTextEl.textContent = 'Generating...';
+            aiLoadingEl.classList.remove('hidden');
+
+            const apiKey = "AIzaSyBAKoz6qhtUnMHabEszPRCcNTnbdjLAk3A"; // Canvas provides this key at runtime
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            const systemPrompt = "You are a professional content writer. Generate concise and creative content in Markdown format based on the user's request.";
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                tools: [{ "google_search": {} }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+            };
+
+            try {
+                const response = await exponentialBackoffFetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+
+                let generatedText = "Error: Could not generate content.";
+                let sourcesHtml = "";
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    generatedText = candidate.content.parts[0].text;
+
+                    // Extract grounding sources
+                    const groundingMetadata = candidate.groundingMetadata;
+                    let sources = [];
+                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                        sources = groundingMetadata.groundingAttributions
+                            .map(attribution => ({
+                                uri: attribution.web?.uri,
+                                title: attribution.web?.title,
+                            }))
+                            .filter(source => source.uri && source.title);
+
+                        if (sources.length > 0) {
+                            sourcesHtml = 'Sources: ' + sources.map((s, index) =>
+                                `<a href="${s.uri}" target="_blank" class="text-indigo-500 hover:text-indigo-700 underline">${s.title} (${index + 1})</a>`
+                            ).join(', ');
+                        }
+                    }
+                }
+
+                aiOutputContentEl.value = generatedText;
+                aiSourcesEl.innerHTML = sourcesHtml;
+                saveAIAsTemplateBtn.disabled = !generatedText.startsWith("Error"); // Disable if error, enable otherwise
+                showMessage("Content successfully generated!", true);
+
+            } catch (error) {
+                console.error("AI Generation Error:", error);
+                aiOutputContentEl.value = `Failed to generate content. Please check the console for details.`;
+                showMessage("Failed to generate content.", false);
+            } finally {
+                generateContentBtn.disabled = false;
+                generateBtnTextEl.textContent = 'Generate Content';
+                aiLoadingEl.classList.add('hidden');
+                // Ensure the button is enabled only if content is not an error message
+                saveAIAsTemplateBtn.disabled = aiOutputContentEl.value.startsWith("Error") || aiOutputContentEl.value === "";
+            }
+        }
+
+        /**
+         * Saves the AI-generated content as a new template in Firestore.
+         */
+        async function saveAIAsTemplate() {
+            const content = aiOutputContentEl.value.trim();
+
+            if (!content || content.startsWith("Error")) {
+                showMessage("No valid content to save. Generate content first.", false);
+                return;
+            }
+
+            const title = `AI Draft - ${new Date().toLocaleDateString('en-US')}`;
+            const newTemplate = {
+                title: title,
+                content: content,
+                timestamp: Date.now()
+            };
+
+            try {
+                const templatesCollectionPath = `/artifacts/${appId}/users/${userId}/templates`;
+                await addDoc(collection(db, templatesCollectionPath), newTemplate);
+                
+                // Clear AI output after saving
+                aiOutputContentEl.value = '';
+                aiSourcesEl.textContent = '';
+                saveAIAsTemplateBtn.disabled = true;
+
+                showMessage(`AI content saved as new template: "${title}"`, true);
+            } catch (e) {
+                console.error("Error saving AI template: ", e);
+                showMessage("Failed to save AI content as a template.", false);
+            }
+        }
+
+
+        /**
+         * Saves or updates a user template.
+         * @param {Event} e The submit event.
+         */
+        async function saveTemplate(e) {
+            e.preventDefault();
+
+            const docId = templateIdInput.value;
+            const title = templateTitleInput.value.trim();
+            const content = templateContentInput.value.trim();
+
+            if (!title || !content) {
+                showMessage("Title and Content cannot be empty.", false);
+                return;
+            }
+
+            const templateData = { title, content, timestamp: Date.now() };
+            const templatesCollectionPath = `/artifacts/${appId}/users/${userId}/templates`;
+            const collectionRef = collection(db, templatesCollectionPath);
+
+            try {
+                if (docId) {
+                    // Update existing document
+                    const docRef = doc(db, templatesCollectionPath, docId);
+                    await setDoc(docRef, templateData, { merge: true });
+                    showMessage("Template successfully updated!", true);
+                } else {
+                    // Add new document
+                    await addDoc(collectionRef, templateData);
+                    showMessage("Template successfully created!", true);
+                }
+
+                // Reset form
+                templateFormEl.reset();
+                templateIdInput.value = '';
+                formTitleEl.textContent = 'Create Template';
+                templateFormEl.classList.add('hidden');
+            } catch (e) {
+                console.error("Error saving template: ", e);
+                showMessage("Failed to save template.", false);
+            }
+        }
+
+        /**
+         * Deletes a user template.
+         * @param {string} docId The ID of the document to delete.
+         */
+        async function deleteTemplate(docId) {
+            try {
+                const templatesCollectionPath = `/artifacts/${appId}/users/${userId}/templates`;
+                await deleteDoc(doc(db, templatesCollectionPath, docId));
+                showMessage("Template successfully deleted!", true);
+            } catch (e) {
+                console.error("Error deleting document: ", e);
+                showMessage("Failed to delete template.", false);
+            }
+        }
+
+        /**
+         * Copies template content to the clipboard.
+         * @param {string} docId The ID of the document to copy.
+         */
+        async function copyTemplateContent(docId) {
+            try {
+                const templatesCollectionPath = `/artifacts/${appId}/users/${userId}/templates`;
+                const docRef = doc(db, templatesCollectionPath, docId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const content = docSnap.data().content;
+                    // Fallback for clipboard access in iframe environment
+                    const textarea = document.createElement('textarea');
+                    textarea.value = content;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+
+                    showMessage("Template content copied to clipboard!", true);
+                }
+            } catch (e) {
+                console.error("Error copying content: ", e);
+                showMessage("Failed to copy content.", false);
+            }
+        }
+
+        /**
+         * Renders the list of templates from Firestore data.
+         * @param {Array} templates The array of template objects.
+         */
+        function renderTemplates(templates) {
+            templatesListEl.innerHTML = '';
+            if (templates.length === 0) {
+                noTemplatesMessageEl.classList.remove('hidden');
+                return;
+            }
+
+            noTemplatesMessageEl.classList.add('hidden');
+
+            templates.forEach(template => {
+                const templateDiv = document.createElement('div');
+                templateDiv.className = 'bg-white p-5 rounded-lg border border-gray-200 hover:border-indigo-400 transition duration-150 ease-in-out flex justify-between items-start space-x-4 ai-card';
+                templateDiv.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-xl font-semibold text-gray-800 truncate">${template.title}</h4>
+                        <p class="text-sm text-gray-500 mt-1 mb-3">Created: ${new Date(template.timestamp).toLocaleDateString()}</p>
+                        <div class="text-gray-700 max-h-24 overflow-y-auto text-sm bg-gray-50 p-3 rounded-md border border-gray-100 whitespace-pre-wrap">${template.content.substring(0, 300)}${template.content.length > 300 ? '...' : ''}</div>
+                    </div>
+                    <div class="flex space-x-2 flex-shrink-0 pt-1">
+                        <button data-action="copy" data-id="${template.id}" class="p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-100 rounded-full transition duration-150 ease-in-out" title="Copy Content">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v10a2 2 0 002 2h2m0-14h8m-8 14h8m-8-2h8m-8-2h8m0 4V7m0 12a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2a2 2 0 00-2 2z" />
+                            </svg>
+                        </button>
+                        <button data-action="edit" data-id="${template.id}" class="p-2 text-blue-600 hover:text-blue-800 bg-blue-100 rounded-full transition duration-150 ease-in-out" title="Edit Template">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </button>
+                        <button data-action="delete" data-id="${template.id}" class="p-2 text-red-600 hover:text-red-800 bg-red-100 rounded-full transition duration-150 ease-in-out" title="Delete Template">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                templatesListEl.appendChild(templateDiv);
+            });
+        }
+
+        /**
+         * Sets up the real-time listener for user templates.
+         */
+        function setupTemplateListener() {
+            if (!db || !userId) return;
+
+            const templatesCollectionPath = `/artifacts/${appId}/users/${userId}/templates`;
+            // Note: Removed orderBy for compliance with best practices; sorting is done in-memory.
+            const q = query(collection(db, templatesCollectionPath));
+
+            onSnapshot(q, (querySnapshot) => {
+                const templates = [];
+                querySnapshot.forEach((doc) => {
+                    templates.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sort by timestamp in memory (descending for newest first)
+                templates.sort((a, b) => b.timestamp - a.timestamp);
+
+                renderTemplates(templates);
+            }, (error) => {
+                console.error("Error setting up template listener:", error);
+                showMessage("Could not load templates.", false);
+            });
+        }
+
+        /**
+         * Initializes Firebase and authenticates the user.
+         */
+        async function initAuth() {
+            if (!firebaseConfig) {
+                console.error("Firebase config is missing.");
+                userIdDisplayEl.textContent = "Error: Config Missing";
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Sign in using the custom token provided by the canvas environment
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    // Fallback to anonymous sign-in if no token is provided
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        userIdDisplayEl.textContent = `User ID: ${userId}`;
+                        setupTemplateListener(); // Start listening once authenticated
+                    } else {
+                        userId = crypto.randomUUID(); // Fallback ID for display/storage path if auth fails
+                        userIdDisplayEl.textContent = `Anonymous ID: ${userId}`;
+                        showMessage("Authentication failed, using anonymous ID.", false);
+                    }
+                });
+
+                // Add event listeners once auth/db is ready
+                templateFormEl.addEventListener('submit', saveTemplate);
+                generateContentBtn.addEventListener('click', generateAIContent);
+                saveAIAsTemplateBtn.addEventListener('click', saveAIAsTemplate);
+
+            } catch (error) {
+                console.error("Firebase or Auth Initialization Error:", error);
+                userIdDisplayEl.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // --- Event Listeners for UI interaction ---
+
+        // Listener for Edit/Delete/Copy buttons on the template list
+        templatesListEl.addEventListener('click', async (e) => {
+            const target = e.target;
+            const action = target.getAttribute('data-action');
+            const docId = target.getAttribute('data-id');
+
+            if (!action || !docId) return;
+
+            if (action === 'edit') {
+                const templatesCollectionPath = `/artifacts/${appId}/users/${userId}/templates`;
+                const docRef = doc(db, templatesCollectionPath, docId);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    templateIdInput.value = docId;
+                    templateTitleInput.value = data.title;
+                    templateContentInput.value = data.content;
+                    formTitleEl.textContent = 'Edit Template';
+                    templateFormEl.classList.remove('hidden');
+                    window.scrollTo({ top: templateFormEl.offsetTop - 100, behavior: 'smooth' });
+                }
+            } else if (action === 'delete') {
+                deleteModalEl.style.display = 'flex';
+                confirmDeleteBtn.onclick = () => {
+                    deleteModalEl.style.display = 'none';
+                    deleteTemplate(docId);
+                };
+                cancelDeleteBtn.onclick = () => {
+                    deleteModalEl.style.display = 'none';
+                };
+            } else if (action === 'copy') {
+                copyTemplateContent(docId);
+            }
+        });
+
+        // Toggle form visibility
+        toggleFormBtn.addEventListener('click', () => {
+            templateFormEl.classList.toggle('hidden');
+            if (!templateFormEl.classList.contains('hidden')) {
+                // Scroll to form when opened
+                window.scrollTo({ top: templateFormEl.offsetTop - 100, behavior: 'smooth' });
+            }
+            // Reset form when toggling
+            templateFormEl.reset();
+            templateIdInput.value = '';
+            formTitleEl.textContent = 'Create Template';
+        });
+
+        // Cancel button in form
+        cancelFormBtn.addEventListener('click', () => {
+            templateFormEl.classList.add('hidden');
+            templateFormEl.reset();
+            templateIdInput.value = '';
+            formTitleEl.textContent = 'Create Template';
+        });
+
+
+        // Initialize the application
+        initAuth();
+    </script>
+</body>
+</html>

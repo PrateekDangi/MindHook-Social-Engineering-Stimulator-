@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>📱 Smishing (SMS) Logs</h2>
+
+<table border="1" cellpadding="8" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th>Timestamp</th>
+      <th>Phone</th>
+      <th>Message (first 50 chars)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log in logs %}
+    <tr>
+      <td>{{ log[0] }}</td>
+      <td>{{ log[1] }}</td>
+      <td>{{ log[2] }}</td>
+      <td>{{ log[3][:50] }}{% if log[3]|length > 50 %}...{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p><a href="/logs">⬅️ Back to Logs Menu</a></p>
+{% endblock %}

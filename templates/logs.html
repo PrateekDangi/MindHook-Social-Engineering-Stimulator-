@@ -1,0 +1,12 @@
+<!-- templates/logs.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h2>📊 View Logs</h2>
+<p>Select the type of log you want to view:</p>
+
+<ul style="font-size: 18px; line-height: 2;">
+  <li><a href="/templates/phishing_logs.html">📧 Phishing Logs</a></li>
+  <li><a href="/templates/smishing_logs.html">📱 Smishing Logs</a></li>
+</ul>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>📱 Smishing Campaign</h2>
+
+<form method="post" action="/send-smishing" onsubmit="return validatePhone();">
+  <div style="margin-bottom: 10px;">
+    <label><strong>Sender Name:</strong></label>
+    <input type="text" name="sender_name_sms" placeholder="Your name" required>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <label><strong>Country Code:</strong></label>
+    <select name="country_code" id="country_code" required>
+      <option value="+91" selected>🇮🇳 +91 (India)</option>
+      <option value="+1">🇺🇸 +1 (USA)</option>
+      <option value="+44">🇬🇧 +44 (UK)</option>
+      <option value="+61">🇦🇺 +61 (Australia)</option>
+    </select>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <label><strong>Phone Number:</strong></label>
+    <input type="text" name="phone_number" id="phone_number" placeholder="10-digit number" maxlength="10" required>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <label><strong>Message Type:</strong></label><br>
+    <input type="radio" name="smsType" value="custom" checked onchange="toggleSmsFields()"> Custom Message
+    <input type="radio" name="smsType" value="template" onchange="toggleSmsFields()"> Predefined Template
+  </div>
+
+  <div id="template-options" style="display: none; margin-bottom: 10px;">
+    <label><strong>Choose Template:</strong></label>
+    <select name="template_option_sms">
+      <option value="bank">Bank Alert</option>
+      <option value="lottery">Lottery Winner</option>
+    </select>
+  </div>
+
+  <div id="custom-sms-box" style="margin-bottom: 10px;">
+    <label><strong>Custom Message:</strong></label><br>
+    <textarea name="message_body_sms" rows="4" cols="60" placeholder="Type your smishing message here..."></textarea>
+  </div>
+
+  <button type="submit">🚀 Send SMS</button>
+</form>
+
+<script>
+  function toggleSmsFields() {
+    const type = document.querySelector('input[name="smsType"]:checked').value;
+    const templateBox = document.getElementById('template-options');
+    const customBox = document.getElementById('custom-sms-box');
+    if (type === 'template') {
+      templateBox.style.display = 'block';
+      customBox.style.display = 'none';
+    } else {
+      templateBox.style.display = 'none';
+      customBox.style.display = 'block';
+    }
+  }
+
+  function validatePhone() {
+    const phone = document.getElementById("phone_number").value;
+    if (!/^\d{10}$/.test(phone)) {
+      alert("❌ Please enter a valid 10-digit phone number.");
+      return false;
+    }
+    return true;
+  }
+
+  window.onload = toggleSmsFields;
+</script>
+{% endblock %}

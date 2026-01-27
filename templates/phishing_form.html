@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>📧 Launch Campaign</h2>
+
+{% if status %}
+  <p style="background: #e0f7e9; color: #2e7d32; padding: 10px; border-radius: 5px;">
+    {{ status }}
+  </p>
+{% endif %}
+
+<form method="post" action="/send-phishing" enctype="multipart/form-data" onsubmit="return captureEditor()">
+  <label>Sender Name</label>
+  <input type="text" name="sender_name" required>
+
+  <label>Sender Email</label>
+  <input type="email" name="sender_email" required>
+
+  <label>App Password</label>
+  <input type="password" name="app_password" required>
+
+  <label>Recipient Email</label>
+  <input type="email" name="recipient_email" required>
+
+  <label>Tracking ID</label>
+  <input type="text" name="user_id" required>
+
+  <label>Email Subject</label>
+  <input type="text" name="subject" required>
+
+  <label>Email Type</label>
+  <select id="emailType" name="emailType" onchange="toggleEmailMode(this.value)">
+    <option value="custom">✍️ Custom Email</option>
+    <option value="template">📋 Predefined Security Template</option>
+  </select>
+
+  <div id="editorContainer">
+    <label>Email Body</label>
+    <div id="editor" style="background:white; height: 200px;"></div>
+    <small style="color:#555; display:block; margin-top:5px;">
+      💡 Use [link] where phishing link should go or use toolbar.
+    </small>
+    <input type="hidden" name="body" id="hidden-body" />
+  </div>
+
+  <label>Attachment (optional)</label>
+  <input type="file" name="attachment" />
+
+  <label>Phishing Link Type</label>
+  <select name="link_option" id="linkOption" onchange="toggleCustomLink(this)">
+    <option value="google">Google Login Page</option>
+    <option value="microsoft">Microsoft Login Page</option>
+    <option value="custom">Custom Link</option>
+  </select>
+
+  <div id="custom-link-box" style="display:none;">
+    <label>Custom Link</label>
+    <input type="text" name="custom_link" placeholder="http://example.com/track?id=..." />
+  </div>
+
+  <input type="submit" value="Send Email">
+</form>
+
+<!-- Google Fonts (Roboto etc.) -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+<!-- Quill Rich Text Editor -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="10px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="10px"]::before {
+    content: "10px";
+  }
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="12px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before {
+    content: "12px";
+  }
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="14px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before {
+    content: "14px";
+  }
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="16px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before {
+    content: "16px";
+  }
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="18px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before {
+    content: "18px";
+  }
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="24px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="24px"]::before {
+    content: "24px";
+  }
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="32px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="32px"]::before {
+    content: "32px";
+  }
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="40px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="40px"]::before {
+    content: "40px";
+  }
+</style>
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<!-- Custom Font Labels -->
+<style>
+  .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="arial"]::before,
+  .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="arial"]::before {
+    content: "Arial";
+    font-family: Arial, sans-serif;
+  }
+  .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="times-new-roman"]::before,
+  .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="times-new-roman"]::before {
+    content: "Times New Roman";
+    font-family: 'Times New Roman', serif;
+  }
+  .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="verdana"]::before,
+  .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="verdana"]::before {
+    content: "Verdana";
+    font-family: Verdana, sans-serif;
+  }
+  .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="roboto"]::before,
+  .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="roboto"]::before {
+    content: "Roboto";
+    font-family: 'Roboto', sans-serif;
+  }
+  .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="georgia"]::before,
+  .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="georgia"]::before {
+    content: "Georgia";
+    font-family: Georgia, serif;
+  }
+</style>
+
+<style>
+  /* FONT FAMILY STYLES */
+  .ql-font-arial { font-family: Arial, sans-serif; }
+  .ql-font-times-new-roman { font-family: 'Times New Roman', serif; }
+  .ql-font-verdana { font-family: Verdana, sans-serif; }
+  .ql-font-roboto { font-family: 'Roboto', sans-serif; }
+  .ql-font-georgia { font-family: Georgia, serif; }
+
+  /* FONT SIZE STYLES */
+  .ql-size-10px { font-size: 10px; }
+  .ql-size-12px { font-size: 12px; }
+  .ql-size-14px { font-size: 14px; }
+  .ql-size-16px { font-size: 16px; }
+  .ql-size-18px { font-size: 18px; }
+  .ql-size-24px { font-size: 24px; }
+  .ql-size-32px { font-size: 32px; }
+  .ql-size-40px { font-size: 40px; }
+</style>
+
+
+<script>
+  // Enable font size options
+  const Size = Quill.import('formats/size');
+  Size.whitelist = ['10px', '12px', '14px', '16px', '18px', '24px', '32px', '40px'];
+  Quill.register(Size, true);
+
+  // Enable custom fonts
+  const Font = Quill.import('formats/font');
+  Font.whitelist = ['arial', 'times-new-roman', 'verdana', 'roboto', 'georgia'];
+  Quill.register(Font, true);
+
+  const quill = new Quill('#editor', {
+    theme: 'snow',
+    placeholder: 'Compose your phishing email...',
+    modules: {
+      toolbar: [
+        [{ 'font': Font.whitelist }, { 'size': Size.whitelist }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'align': [] }],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        [{ 'indent': '-1' }, { 'indent': '+1' }],
+        ['link', 'image'],
+        ['clean']
+      ]
+    }
+  });
+
+  function toggleCustomLink(select) {
+    const box = document.getElementById("custom-link-box");
+    box.style.display = select.value === "custom" ? "block" : "none";
+  }
+
+  function toggleEmailMode(mode) {
+    const userId = document.querySelector('input[name="user_id"]').value || "user123";
+    const linkType = document.querySelector('select[name="link_option"]').value;
+    const customLink = document.querySelector('input[name="custom_link"]').value || "#";
+
+    let phishingLink = "#";
+    if (linkType === "google") {
+      phishingLink = `http://localhost:8000/track?id=${userId}&type=google`;
+    } else if (linkType === "microsoft") {
+      phishingLink = `http://localhost:8000/track?id=${userId}&type=microsoft`;
+    } else if (linkType === "custom") {
+      phishingLink = customLink;
+    }
+
+    if (mode === "template") {
+      document.querySelector('input[name="subject"]').value = "⚠️ Security alert";
+      const template = `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px;border:1px solid #ccc;border-radius:8px;">
+        <div style="text-align:center;">
+          <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/logo_gmail_lockup_default_1x_r2.png" alt="Google Logo" height="40">
+          <h2 style="color:#202124;">A new sign-in on Android</h2>
+          <p style="color:#5f6368;">prateek22csu309@ncuindia.edu</p>
+          <p style="font-size:15px;">We noticed a new sign-in to your Google Account. If this wasn't you, we’ll help secure your account.</p>
+          <div style="margin-top:20px;">
+            <a href="${phishingLink}" style="background:#1a73e8;color:white;padding:10px 20px;text-decoration:none;border-radius:4px;">Check activity</a>
+          </div>
+          <div style="margin-top:15px;">
+            <a href="${phishingLink}" style="background:#d93025;color:white;padding:10px 20px;text-decoration:none;border-radius:4px;">Report this activity</a>
+          </div>
+          <p style="font-size:12px;color:#777;margin-top:25px;">You can also visit your account <a href="${phishingLink}" style="color:#1a73e8;">security page</a>.</p>
+        </div>
+        <img src="http://localhost:8000/open?id=${userId}" width="1" height="1" style="display:none;">
+      </div>`;
+      quill.root.innerHTML = template;
+    } else {
+      document.querySelector('input[name="subject"]').value = "";
+      quill.root.innerHTML = '';
+    }
+  }
+
+function captureEditor() {
+  const content = quill.root.innerHTML;
+  const container = document.createElement("div");
+  container.innerHTML = content;
+
+  const alignMap = {
+    "ql-align-center": "center",
+    "ql-align-right": "right",
+    "ql-align-justify": "justify"
+  };
+
+  const fontMap = {
+    'ql-font-arial': 'Arial, sans-serif',
+    'ql-font-times-new-roman': '"Times New Roman", serif',
+    'ql-font-verdana': 'Verdana, sans-serif',
+    'ql-font-roboto': '"Roboto", sans-serif',
+    'ql-font-georgia': 'Georgia, serif'
+  };
+
+  container.querySelectorAll("*").forEach(el => {
+    // Alignment
+    for (const cls in alignMap) {
+      if (el.classList.contains(cls)) {
+        el.style.textAlign = alignMap[cls];
+        el.classList.remove(cls);
+      }
+    }
+
+    // Font size
+    const sizeClass = Array.from(el.classList).find(c => c.startsWith('ql-size-'));
+    if (sizeClass) {
+      const size = sizeClass.replace('ql-size-', '');
+      el.style.fontSize = /^\d+$/.test(size) ? size + "px" : size;
+      el.classList.remove(sizeClass);
+    }
+
+    // Font family
+    const fontClass = Array.from(el.classList).find(c => c.startsWith('ql-font-'));
+    if (fontClass && fontMap[fontClass]) {
+      el.style.fontFamily = fontMap[fontClass];
+      el.classList.remove(fontClass);
+    }
+  });
+
+  // Make links look clickable
+  container.querySelectorAll("a").forEach(link => {
+    link.setAttribute("target", "_blank");
+    link.setAttribute("rel", "noopener noreferrer");
+    link.style.color = "#1a73e8";
+    link.style.textDecoration = "underline";
+  });
+
+  document.getElementById("hidden-body").value = container.innerHTML;
+  return true;
+}
+</script>
+{% endblock %}

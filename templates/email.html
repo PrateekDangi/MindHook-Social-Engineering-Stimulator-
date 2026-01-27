@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>⚠️ Security Alert</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f1f1f1; padding: 40px; display: flex; justify-content: center;">
+    <div style="background: white; padding: 30px; border-radius: 8px; max-width: 600px; width: 100%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); text-align: center;">
+        
+        <!-- Google Logo -->
+        <img src="https://ssl.gstatic.com/accounts/ui/logo_2x.png" alt="Google Logo" style="width: 120px; margin-bottom: 20px;">
+
+        <h2 style="color: #d93025;">⚠️ New Sign-in Attempt Detected</h2>
+        <p style="font-size: 16px;">We detected a suspicious login attempt to your Google Account.</p>
+        <p style="font-size: 16px;">If this was you, you can safely ignore this email. If not, please secure your account immediately.</p>
+        
+        <!-- First phishing link -->
+        <a href="{{ phishing_link }}" style="display: inline-block; margin-top: 20px; background-color: #1a73e8; color: white; padding: 12px 24px; text-decoration: none; font-size: 16px; border-radius: 5px;">Check activity</a>
+
+        <!-- Second phishing link -->
+        <div style="margin-top: 15px;">
+            <a href="{{ phishing_link }}" style="font-size: 14px; color: #1a73e8; text-decoration: underline;">Report this activity</a>
+        </div>
+        
+        <p style="margin-top: 30px; font-size: 12px; color: #777;">This message was sent by Google Account Security Team. If you didn’t request this, someone else may be trying to access your account.</p>
+        
+        <!-- Invisible tracking pixel -->
+        <img src="{{ open_link }}" width="1" height="1" style="display: none;">
+    </div>
+</body>
+</html>

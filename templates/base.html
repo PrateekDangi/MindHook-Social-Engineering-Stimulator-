@@ -1,0 +1,161 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>SEsim Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/script.js" defer></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    .sidebar {
+      height: 100vh;
+      width: 220px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background-color: #038db7;
+      padding-top: 20px;
+      color: white;
+      overflow-y: auto;
+    }
+
+    .sidebar .logo {
+
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .sidebar .logo img {
+      width: 80px;
+    }
+
+    .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .sidebar ul li {
+      padding: 10px 20px;
+    }
+
+    .sidebar ul li a {
+      color: white;
+      text-decoration: none;
+      display: block;
+    }
+
+    .sidebar ul li a:hover {
+      background-color: #0c58b1;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 30px;
+    }
+
+    .toggle-btn {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: #038db7;
+      cursor: pointer;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      max-width: 700px;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #038db7;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    input[type="submit"] {
+      background: #038db7;
+      color: white;
+      font-weight: bold;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <img src="../static/assets/mindhook-logo.jpg" alt="MindHook Logo">
+    </div>
+
+    <ul class="sidebar-menu">
+      <li>
+        <details open>
+          <summary>🎯 Campaigns</summary>
+          <ul style="margin-left: 15px;">
+            <li><a href="/form">📧 Phishing Campaign</a></li>
+            <li><a href="/smishing-form">📱 Smishing Campaign</a></li>
+          </ul>
+        </details>
+      </li>
+      <li>
+        <details>
+          <summary>📄 Templates</summary>
+          <ul style="margin-left: 15px;">
+            <li><a href="/cms">📝 Template CMS</a></li>
+          </ul>
+        </details>
+      </li>
+      <li>
+        <details>
+          <summary>📊 Activity Logs</summary>
+          <ul style="margin-left: 15px;">
+            <li><a href="/logs/phishing">📧 Phishing Logs</a></li>
+            <li><a href="/logs/smishing">📱 Smishing Logs</a></li>
+          </ul>
+        </details>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content from templates -->
+  <div class="main-content">
+    {% block content %}
+    {% endblock %}
+  </div>
+</body>
+
+</html>
