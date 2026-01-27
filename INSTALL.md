@@ -10,7 +10,8 @@ This guide explains how to set up and run SeSim locally.
 git clone https://github.com/your-username/SeSim.git
 cd SeSim
 
-2️⃣ Create Virtual Environment (Recommended)
+
+## 2️⃣ Create Virtual Environment (Recommended)
 
 python -m venv venv
 
