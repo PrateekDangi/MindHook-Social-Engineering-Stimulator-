@@ -60,6 +60,41 @@ It helps students, security teams, and researchers understand human-centric atta
 
 ---
 
+## 📂 Project Structure
+SeSim/
+│
+├── templates/
+│ ├── phishing_form.html
+│ ├── smishing_form.html
+│ ├── fake_google_login.html
+│ └── logs.html
+│
+├── static/
+│ ├── css/
+│ ├── js/
+│ └── images/
+|
+├── ScreenShot
+|
+├── main.py
+├── mailer.py
+├── smishr.py
+├── viewlogs.py
+├── db.py
+├── mindhook-logo.png
+├── pixel.png
+├── INSTALL.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── SECURITY.md
+├── CODE_OF_CONDUCT.md
+├── .gitignore
+├── requirements.txt
+├── requirements.txt
+└── README.md
+
+---
+
 ## ⚙️ Installation
 
 📌 **Detailed installation steps are available here:**  
