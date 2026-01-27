@@ -61,6 +61,8 @@ It helps students, security teams, and researchers understand human-centric atta
 ---
 
 ## 📂 Project Structure
+
+```
 SeSim/
 │
 ├── templates/
@@ -92,6 +94,7 @@ SeSim/
 ├── requirements.txt
 ├── requirements.txt
 └── README.md
+```
 
 ---
 
