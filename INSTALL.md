@@ -43,10 +43,48 @@ pip install -r requirements.txt
 ---
 
 ## 4️⃣ Configure Email (Optional – for phishing mails)
+
 Edit backend/mailer.py:
+
 ```bash
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 EMAIL = "your_email@gmail.com"
 PASSWORD = "your_app_password"
+```
+
+⚠️ Important:
+Use App Passwords, not real email passwords.
+
+---
+
+## ▶️ Running the Project
+
+Start the FastAPI server:
+
+```bash
+python -m uvicorn backend.main:app --reload
+```
+
+---
+
+## 🌐 Access URLs
+
+Phishing Simulator
+
+```bash
+http://127.0.0.1:8000/phishing
+```
+
+Smishing Simulator
+
+```bash
+http://127.0.0.1:8000/smishing
+```
+
+Logs Viewer
+
+```
+http://127.0.0.1:8000/logs/phishing
+http://127.0.0.1:8000/logs/smishing
 ```
