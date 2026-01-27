@@ -33,3 +33,20 @@ source venv/bin/activate
 ```
 
 ---
+
+## 3️⃣ Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## 4️⃣ Configure Email (Optional – for phishing mails)
+Edit backend/mailer.py:
+```bash
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+EMAIL = "your_email@gmail.com"
+PASSWORD = "your_app_password"
+```
