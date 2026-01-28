@@ -1,9 +1,13 @@
-# MindHook-Social-Engineering-Stimulator-
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=200&section=header&text=MindHook&fontSize=60&desc=Social%20Engineering%20Stimulator">
+</p>
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Status](https://img.shields.io/badge/Status-Active-success)
+
+# MindHook-Social-Engineering-Stimulator-
 
 SeSim (Social Engineering Simulator) is a cybersecurity training and awareness platform designed to simulate real-world phishing and smishing attacks in a controlled and ethical environment.
 
